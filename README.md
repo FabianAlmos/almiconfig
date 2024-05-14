@@ -71,6 +71,23 @@ the **almi** struct tag.
     ```
     
 ## Usage example:
+**.env**:
+```
+ACCESS_SECRET=access_secret
+REFRESH_SECRET=refresh_secret
+ACCESS_LIFETIME=2
+REFRESH_LIFETIME=30
+
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+POSTGRES_HOST=postgres
+PGPORT=5432
+POSTGRES_DB=postgres
+
+KAFKA_BROKERS=broker1,broker2,broker3
+```
+
+**main.go**:
 ```go
 package main
 
