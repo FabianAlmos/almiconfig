@@ -1,6 +1,7 @@
 package almi
 
 import (
+	"almi/consts"
 	"almi/lexer"
 	almitypes "almi/types"
 	"almi/util"
@@ -22,7 +23,6 @@ const (
 	slice     = "\\[\\]"
 	typeSlice = "^(type=\\[.{1}\\].+)$"
 
-	empty    = ""
 	_bool    = "bool"
 	_string  = "string"
 	_int     = "int"
@@ -66,7 +66,7 @@ func parseConstraints(constraint *almitypes.ConfigConstraint, constraints []stri
 			continue
 		case regexp.MustCompile(_type).MatchString(c):
 			if regexp.MustCompile(typeSlice).MatchString(c) {
-				sliceType := regexp.MustCompile(typeEq).ReplaceAll([]byte(c), []byte(empty))
+				sliceType := regexp.MustCompile(typeEq).ReplaceAll([]byte(c), []byte(consts.EMPTY))
 				sep := regexp.MustCompile(sliceSep).Find(sliceType)
 				if len(sep) != 3 {
 					return errors.New(
@@ -76,13 +76,13 @@ func parseConstraints(constraint *almitypes.ConfigConstraint, constraints []stri
 						),
 					)
 				}
-				constraint.Type = string(regexp.MustCompile(sliceSep).ReplaceAll(sliceType, []byte(empty)))
+				constraint.Type = string(regexp.MustCompile(sliceSep).ReplaceAll(sliceType, []byte(consts.EMPTY)))
 				constraint.SliceType = true
 				constraint.Separator = string(sep[1])
 				continue
 			}
 
-			constraint.Type = string(regexp.MustCompile(typeEq).ReplaceAll([]byte(c), []byte(empty)))
+			constraint.Type = string(regexp.MustCompile(typeEq).ReplaceAll([]byte(c), []byte(consts.EMPTY)))
 			continue
 		default:
 			return errors.New(
@@ -99,7 +99,7 @@ func parseConstraints(constraint *almitypes.ConfigConstraint, constraints []stri
 }
 
 func checkConstraints(cc almitypes.ConfigConstraint, val *almitypes.ConfigValue) error {
-	if cc.EnvName == empty {
+	if cc.EnvName == consts.EMPTY {
 		return errors.New(
 			fmt.Sprintf(
 				"AlmiConfig: 'env=' constraint must be defined for all fields of the config, constraint not found for field: '%s'",
@@ -108,7 +108,7 @@ func checkConstraints(cc almitypes.ConfigConstraint, val *almitypes.ConfigValue)
 		)
 	}
 
-	if cc.Required && val.Value.String() == empty {
+	if cc.Required && val.Value.String() == consts.EMPTY {
 		return errors.New(
 			fmt.Sprintf(
 				"AlmiConfig: Field: '%s', is required",
@@ -135,7 +135,7 @@ func ValidateConfig[T any](config T) (*T, error) {
 			err    error
 		)
 		switch cfgConstraint.Type {
-		case empty, _string:
+		case consts.EMPTY, _string:
 			envVar, err = util.AlmiStr[string](cfgConstraint)
 		case _bool:
 			envVar, err = util.AlmiAtob[bool](cfgConstraint)
@@ -187,10 +187,10 @@ func ValidateConfig[T any](config T) (*T, error) {
 
 		envVarValue := reflect.ValueOf(envVar)
 		field := cfg.FieldByName(val.Field.Name)
-		structTagType := string(regexp.MustCompile(slice).ReplaceAll([]byte(field.Type().String()), []byte(empty)))
+		structTagType := string(regexp.MustCompile(slice).ReplaceAll([]byte(field.Type().String()), []byte(consts.EMPTY)))
 		if !(cfgConstraint.SliceType && cfgConstraint.Type == structTagType) &&
 			field.Type().String() != cfgConstraint.Type &&
-			!(field.Type().String() == _string && cfgConstraint.Type == empty) {
+			!(field.Type().String() == _string && cfgConstraint.Type == consts.EMPTY) {
 			return nil, errors.New(
 				fmt.Sprintf(
 					"AlmiConfig: field: '%s' type: '%s' in config struct does not match the constraint type: '%s' in config struct tag",

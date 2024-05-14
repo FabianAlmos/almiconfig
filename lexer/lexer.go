@@ -1,5 +1,7 @@
 package lexer
 
+import "almi/consts"
+
 const (
 	COMMA      = 44
 	LSQBRACKET = 91
@@ -46,13 +48,13 @@ func (l *Lexer) Tokenize() []string {
 		if l.Char == COMMA && l.Token[len(l.Token)-1] != LSQBRACKET {
 			l.Next()
 			l.Tokens = append(l.Tokens, l.Token)
-			l.Token = ""
+			l.Token = consts.EMPTY
 		}
 		l.Token += string(l.Char)
 	}
 
 	l.Tokens = append(l.Tokens, l.Token)
-	l.Token = ""
+	l.Token = consts.EMPTY
 
 	return l.Tokens
 }
