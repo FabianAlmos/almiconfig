@@ -2,8 +2,8 @@ package util
 
 import (
 	"almi/consts"
+	almierrors "almi/errors"
 	almitypes "almi/types"
-	"errors"
 	"golang.org/x/exp/constraints"
 	"os"
 	"strconv"
@@ -38,7 +38,7 @@ func AlmiAtoi[T Number](cc almitypes.ConfigConstraint) (any, error) {
 
 		return ns, nil
 	} else if cc.SliceType && cc.Separator == consts.EMPTY {
-		return T(0), errors.New("AlmiConfig: separator must be specified for AlmiAtoi func when 'val' is of type []T")
+		return T(0), almierrors.SepAtoiErr.Build()
 	}
 
 	n, err := strconv.Atoi(envVal)
@@ -65,7 +65,7 @@ func AlmiStr[T ~string](cc almitypes.ConfigConstraint) (val any, err error) {
 
 		return strs, nil
 	} else if cc.SliceType && cc.Separator == consts.EMPTY {
-		return T(consts.EMPTY), errors.New("AlmiConfig: separator must be specified for AlmiStr func when 'val' is of type []T")
+		return T(consts.EMPTY), almierrors.SepStrErr.Build()
 	}
 
 	return T(envVal), nil
@@ -92,7 +92,7 @@ func AlmiAtob[T ~bool](cc almitypes.ConfigConstraint) (val any, err error) {
 
 		return bs, nil
 	} else if cc.SliceType && cc.Separator == consts.EMPTY {
-		return T(false), errors.New("AlmiConfig: separator must be specified for AlmiAtob func when 'val' is of type []T")
+		return T(false), almierrors.SepAtobErr.Build()
 	}
 
 	b, err := strconv.ParseBool(envVal)
@@ -115,7 +115,7 @@ func AlmiAtoRB[T ~rune | ~byte](cc almitypes.ConfigConstraint) (val any, err err
 		for _, val := range vals {
 			n, err := strconv.Atoi(val)
 			if err != nil {
-				return T(0), errors.New("AlmiConfig: failed to convert string to int to convert to rune/byte")
+				return T(0), almierrors.AtoRBConversionFailed.Build()
 			}
 
 			rbs = append(rbs, T(n))
@@ -123,12 +123,12 @@ func AlmiAtoRB[T ~rune | ~byte](cc almitypes.ConfigConstraint) (val any, err err
 
 		return rbs, nil
 	} else if cc.SliceType && cc.Separator == consts.EMPTY {
-		return T(0), errors.New("AlmiConfig: separator must be specified for AlmiAtoRB func when 'val' is of type []T")
+		return T(0), almierrors.SepAtoRBErr.Build()
 	}
 
 	n, err := strconv.Atoi(envVal)
 	if err != nil {
-		return T(0), errors.New("AlmiConfig: failed to convert string to int to convert to rune/byte")
+		return T(0), almierrors.AtoRBConversionFailed.Build()
 	}
 
 	return T(n), nil

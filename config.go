@@ -2,11 +2,10 @@ package almi
 
 import (
 	"almi/consts"
+	almierrors "almi/errors"
 	"almi/lexer"
 	almitypes "almi/types"
 	"almi/util"
-	"errors"
-	"fmt"
 	"reflect"
 	"regexp"
 )
@@ -69,12 +68,7 @@ func parseConstraints(constraint *almitypes.ConfigConstraint, constraints []stri
 				sliceType := regexp.MustCompile(typeEq).ReplaceAll([]byte(c), []byte(consts.EMPTY))
 				sep := regexp.MustCompile(sliceSep).Find(sliceType)
 				if len(sep) != 3 {
-					return errors.New(
-						fmt.Sprintf(
-							"AlmiConfig: field: '%s': slice types must specify a separator character in their brackets",
-							constraint.FieldName,
-						),
-					)
+					return almierrors.SepUndefErr.Build(constraint.FieldName)
 				}
 				constraint.Type = string(regexp.MustCompile(sliceSep).ReplaceAll(sliceType, []byte(consts.EMPTY)))
 				constraint.SliceType = true
@@ -85,13 +79,7 @@ func parseConstraints(constraint *almitypes.ConfigConstraint, constraints []stri
 			constraint.Type = string(regexp.MustCompile(typeEq).ReplaceAll([]byte(c), []byte(consts.EMPTY)))
 			continue
 		default:
-			return errors.New(
-				fmt.Sprintf(
-					"AlmiConfig: Constarint: '%s' at Field: '%s', is unknown to almi config",
-					c,
-					constraint.FieldName,
-				),
-			)
+			return almierrors.ConstraintUnknownErr.Build(c, constraint.FieldName)
 		}
 	}
 
@@ -138,12 +126,7 @@ func findType(cc almitypes.ConfigConstraint) (any, error) {
 	case _rune:
 		envVar, err = util.AlmiAtoRB[rune](cc)
 	default:
-		return nil, errors.New(
-			fmt.Sprintf(
-				"AlmiConfig: unrecognized type: '%s'",
-				cc.Type,
-			),
-		)
+		return nil, almierrors.UnrecognizedTypeErr.Build(cc.Type)
 	}
 
 	return envVar, err
@@ -157,13 +140,12 @@ func setFieldValue(envVar any, cfg reflect.Value, val *almitypes.ConfigValue, cc
 	if !(cc.SliceType && cc.Type == structTagType) &&
 		field.Type().String() != cc.Type &&
 		!(field.Type().String() == _string && cc.Type == consts.EMPTY) {
-		return errors.New(
-			fmt.Sprintf(
-				"AlmiConfig: field: '%s' type: '%s' in config struct does not match the constraint type: '%s' in config struct tag",
-				val.Field.Name,
-				field.Type().String(),
-				cc.Type,
-			),
+		return almierrors.FieldStructTagTypeMismatchErr.Build(
+			val.Field.Name,
+			field.Type().String(),
+			cfg.Type().String(),
+			cc.Type,
+			cfg.Type().String(),
 		)
 	}
 
@@ -174,21 +156,11 @@ func setFieldValue(envVar any, cfg reflect.Value, val *almitypes.ConfigValue, cc
 
 func checkConstraints(cc almitypes.ConfigConstraint, val *almitypes.ConfigValue) error {
 	if cc.EnvName == consts.EMPTY {
-		return errors.New(
-			fmt.Sprintf(
-				"AlmiConfig: 'env=' constraint must be defined for all fields of the config, constraint not found for field: '%s'",
-				val.Field.Name,
-			),
-		)
+		return almierrors.EnvConstraintUndefErr.Build(val.Field.Name)
 	}
 
 	if cc.Required && val.Value.String() == consts.EMPTY {
-		return errors.New(
-			fmt.Sprintf(
-				"AlmiConfig: Field: '%s', is required",
-				val.Field.Name,
-			),
-		)
+		return almierrors.FieldRequiredErr.Build(val.Field.Name)
 	}
 
 	return nil
@@ -206,13 +178,7 @@ func ValidateConfig[T any](config T) (*T, error) {
 
 		envVar, err := findType(cfgConstraint)
 		if err != nil {
-			return nil, errors.New(
-				fmt.Sprintf(
-					"AlmiConfig: failed to convert type of '%s' to %s from string",
-					cfgConstraint.EnvName,
-					cfgConstraint.Type,
-				),
-			)
+			return nil, almierrors.FailedToConvertTypeErr.Build(cfgConstraint.EnvName, cfgConstraint.Type)
 		}
 
 		if err := setFieldValue(envVar, cfg, val, cfgConstraint); err != nil {
