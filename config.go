@@ -98,6 +98,80 @@ func parseConstraints(constraint *almitypes.ConfigConstraint, constraints []stri
 	return nil
 }
 
+func findType(cc almitypes.ConfigConstraint) (any, error) {
+	var (
+		envVar any
+		err    error
+	)
+
+	switch cc.Type {
+	case consts.EMPTY, _string:
+		envVar, err = util.AlmiStr[string](cc)
+	case _bool:
+		envVar, err = util.AlmiAtob[bool](cc)
+	case _int:
+		envVar, err = util.AlmiAtoi[int](cc)
+	case _int8:
+		envVar, err = util.AlmiAtoi[int8](cc)
+	case _int16:
+		envVar, err = util.AlmiAtoi[int16](cc)
+	case _int32:
+		envVar, err = util.AlmiAtoi[int32](cc)
+	case _int64:
+		envVar, err = util.AlmiAtoi[int64](cc)
+	case _uint8:
+		envVar, err = util.AlmiAtoi[uint8](cc)
+	case _uint16:
+		envVar, err = util.AlmiAtoi[uint16](cc)
+	case _uint32:
+		envVar, err = util.AlmiAtoi[uint32](cc)
+	case _uint64:
+		envVar, err = util.AlmiAtoi[uint64](cc)
+	case _uintptr:
+		envVar, err = util.AlmiAtoi[uintptr](cc)
+	case _float32:
+		envVar, err = util.AlmiAtoi[float32](cc)
+	case _float64:
+		envVar, err = util.AlmiAtoi[float64](cc)
+	case _byte:
+		envVar, err = util.AlmiAtoRB[byte](cc)
+	case _rune:
+		envVar, err = util.AlmiAtoRB[rune](cc)
+	default:
+		return nil, errors.New(
+			fmt.Sprintf(
+				"AlmiConfig: unrecognized type: '%s'",
+				cc.Type,
+			),
+		)
+	}
+
+	return envVar, err
+}
+
+func setFieldValue(envVar any, cfg reflect.Value, val *almitypes.ConfigValue, cc almitypes.ConfigConstraint) error {
+	envVarValue := reflect.ValueOf(envVar)
+	field := cfg.FieldByName(val.Field.Name)
+	structTagType := string(regexp.MustCompile(slice).ReplaceAll([]byte(field.Type().String()), []byte(consts.EMPTY)))
+
+	if !(cc.SliceType && cc.Type == structTagType) &&
+		field.Type().String() != cc.Type &&
+		!(field.Type().String() == _string && cc.Type == consts.EMPTY) {
+		return errors.New(
+			fmt.Sprintf(
+				"AlmiConfig: field: '%s' type: '%s' in config struct does not match the constraint type: '%s' in config struct tag",
+				val.Field.Name,
+				field.Type().String(),
+				cc.Type,
+			),
+		)
+	}
+
+	field.Set(envVarValue)
+
+	return nil
+}
+
 func checkConstraints(cc almitypes.ConfigConstraint, val *almitypes.ConfigValue) error {
 	if cc.EnvName == consts.EMPTY {
 		return errors.New(
@@ -130,51 +204,7 @@ func ValidateConfig[T any](config T) (*T, error) {
 			return nil, err
 		}
 
-		var (
-			envVar any
-			err    error
-		)
-		switch cfgConstraint.Type {
-		case consts.EMPTY, _string:
-			envVar, err = util.AlmiStr[string](cfgConstraint)
-		case _bool:
-			envVar, err = util.AlmiAtob[bool](cfgConstraint)
-		case _int:
-			envVar, err = util.AlmiAtoi[int](cfgConstraint)
-		case _int8:
-			envVar, err = util.AlmiAtoi[int8](cfgConstraint)
-		case _int16:
-			envVar, err = util.AlmiAtoi[int16](cfgConstraint)
-		case _int32:
-			envVar, err = util.AlmiAtoi[int32](cfgConstraint)
-		case _int64:
-			envVar, err = util.AlmiAtoi[int64](cfgConstraint)
-		case _uint8:
-			envVar, err = util.AlmiAtoi[uint8](cfgConstraint)
-		case _uint16:
-			envVar, err = util.AlmiAtoi[uint16](cfgConstraint)
-		case _uint32:
-			envVar, err = util.AlmiAtoi[uint32](cfgConstraint)
-		case _uint64:
-			envVar, err = util.AlmiAtoi[uint64](cfgConstraint)
-		case _uintptr:
-			envVar, err = util.AlmiAtoi[uintptr](cfgConstraint)
-		case _float32:
-			envVar, err = util.AlmiAtoi[float32](cfgConstraint)
-		case _float64:
-			envVar, err = util.AlmiAtoi[float64](cfgConstraint)
-		case _byte:
-			envVar, err = util.AlmiAtoRB[byte](cfgConstraint)
-		case _rune:
-			envVar, err = util.AlmiAtoRB[rune](cfgConstraint)
-		default:
-			return nil, errors.New(
-				fmt.Sprintf(
-					"AlmiConfig: unrecognized type: '%s'",
-					cfgConstraint.Type,
-				),
-			)
-		}
+		envVar, err := findType(cfgConstraint)
 		if err != nil {
 			return nil, errors.New(
 				fmt.Sprintf(
@@ -185,22 +215,9 @@ func ValidateConfig[T any](config T) (*T, error) {
 			)
 		}
 
-		envVarValue := reflect.ValueOf(envVar)
-		field := cfg.FieldByName(val.Field.Name)
-		structTagType := string(regexp.MustCompile(slice).ReplaceAll([]byte(field.Type().String()), []byte(consts.EMPTY)))
-		if !(cfgConstraint.SliceType && cfgConstraint.Type == structTagType) &&
-			field.Type().String() != cfgConstraint.Type &&
-			!(field.Type().String() == _string && cfgConstraint.Type == consts.EMPTY) {
-			return nil, errors.New(
-				fmt.Sprintf(
-					"AlmiConfig: field: '%s' type: '%s' in config struct does not match the constraint type: '%s' in config struct tag",
-					val.Field.Name,
-					field.Type().String(),
-					cfgConstraint.Type,
-				),
-			)
+		if err := setFieldValue(envVar, cfg, val, cfgConstraint); err != nil {
+			return nil, err
 		}
-		field.Set(envVarValue)
 
 		if err := checkConstraints(cfgConstraint, val); err != nil {
 			return nil, err
