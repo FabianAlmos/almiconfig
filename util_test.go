@@ -1,4 +1,4 @@
-package almi
+package almiconfig
 
 import (
 	"github.com/stretchr/testify/assert"
