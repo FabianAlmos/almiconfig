@@ -1,7 +1,7 @@
 package lexer_test
 
 import (
-	"almi/lexer"
+	"github.com/FabianAlmos/almiconfig/lexer"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )

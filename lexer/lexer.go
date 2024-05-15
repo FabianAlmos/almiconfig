@@ -1,6 +1,6 @@
 package lexer
 
-import "almi/consts"
+import "github.com/FabianAlmos/almiconfig/consts"
 
 const (
 	COMMA      = 44

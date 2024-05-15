@@ -1,8 +1,8 @@
 package almiconfig
 
 import (
-	"almi/consts"
-	almierrors "almi/errors"
+	"github.com/FabianAlmos/almiconfig/consts"
+	almierrors "github.com/FabianAlmos/almiconfig/errors"
 	"reflect"
 	"regexp"
 )

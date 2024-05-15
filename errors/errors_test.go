@@ -1,7 +1,7 @@
 package almierrors_test
 
 import (
-	almierrors "almi/errors"
+	almierrors "github.com/FabianAlmos/almiconfig/errors"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )

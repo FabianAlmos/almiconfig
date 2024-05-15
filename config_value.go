@@ -1,7 +1,7 @@
 package almiconfig
 
 import (
-	"almi/lexer"
+	"github.com/FabianAlmos/almiconfig/lexer"
 	"reflect"
 )
 
