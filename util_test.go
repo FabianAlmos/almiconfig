@@ -1,25 +1,12 @@
-package util_test
+package almi
 
 import (
-	almitypes "almi/types"
-	"almi/util"
 	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
 )
 
 const (
-	_uintptr = "uintptr"
-	_int     = "int"
-	_int8    = "int8"
-	_int16   = "int16"
-	_int32   = "int32"
-	_int64   = "int64"
-	_uint8   = "uint8"
-	_uint16  = "uint16"
-	_uint32  = "uint32"
-	_uint64  = "uint64"
-
 	badVal   = "badval"
 	zeroStr  = "0"
 	oneStr   = "1"
@@ -57,7 +44,7 @@ const (
 	nineStrSlice  = "9,9"
 
 	empty       = ""
-	str         = "str"
+	strKey      = "str"
 	strVal      = "strVal"
 	strSliceVal = "strVal,strVal"
 
@@ -99,10 +86,8 @@ var (
 	intTypes     = []string{_uintptr, _int, _int8, _int16, _int32, _int64, _uint8, _uint16, _uint32, _uint64}
 	strVals      = []string{zeroStr, oneStr, twoStr, threeStr, fourStr, fiveStr, sixStr, sevenStr, eightStr, nineStr}
 	badStrVals   = []string{badVal, badVal, badVal, badVal, badVal, badVal, badVal, badVal, badVal, badVal}
-	vals         = []any{zero, one, two, three, four, five, six, seven, eight, nine}
 	sliceVals    = []string{zeroStrSlice, oneStrSlice, twoStrSlice, threeStrSlice, fourStrSlice, fiveStrSlice, sixStrSlice, sevenStrSlice, eightStrSlice, nineStrSlice}
 	badSliceVals = []string{badStrSlice, badStrSlice, badStrSlice, badStrSlice, badStrSlice, badStrSlice, badStrSlice, badStrSlice, badStrSlice, badStrSlice}
-	valsSlice    = []any{zeroSlice, oneSlice, twoSlice, threeSlice, fourSlice, fiveSlice, sixSlice, sevenSlice, eightSlice, nineSlice}
 )
 
 func testSetEnv(t *testing.T, key, val string) {
@@ -117,34 +102,34 @@ func initIntEnv(t *testing.T, vals []string) {
 	}
 }
 
-func testAlmiAtoi[T util.Number](t *testing.T, key string, expect any) {
-	cc := almitypes.ConfigConstraint{EnvName: key}
-	envVar, err := util.AlmiAtoi[T](cc)
+func testAlmiAtoi[T number](t *testing.T, key string, expect any) {
+	cc := configConstraint{EnvName: key}
+	envVar, err := atoi[T](cc)
 	if err != nil {
 		t.Fail()
 	}
 	assert.Equal(t, expect, envVar)
 }
 
-func testAlmiAtoiSlice[T util.Number](t *testing.T, key string, expect any) {
-	cc := almitypes.ConfigConstraint{EnvName: key, SliceType: true, Separator: comma}
-	envVar, err := util.AlmiAtoi[T](cc)
+func testAlmiAtoiSlice[T number](t *testing.T, key string, expect any) {
+	cc := configConstraint{EnvName: key, SliceType: true, Separator: comma}
+	envVar, err := atoi[T](cc)
 	if err != nil {
 		t.Fail()
 	}
 	assert.Equal(t, expect, envVar)
 }
 
-func testAlmiAtoiFail[T util.Number](t *testing.T, key string) {
-	cc := almitypes.ConfigConstraint{EnvName: key}
-	envVar, err := util.AlmiAtoi[T](cc)
+func testAlmiAtoiFail[T number](t *testing.T, key string) {
+	cc := configConstraint{EnvName: key}
+	envVar, err := atoi[T](cc)
 	assert.Equal(t, T(0), envVar)
 	assert.NotNil(t, err)
 }
 
-func testAlmiAtoiSliceFail[T util.Number](t *testing.T, key string) {
-	cc := almitypes.ConfigConstraint{EnvName: key, SliceType: true, Separator: comma}
-	envVar, err := util.AlmiAtoi[T](cc)
+func testAlmiAtoiSliceFail[T number](t *testing.T, key string) {
+	cc := configConstraint{EnvName: key, SliceType: true, Separator: comma}
+	envVar, err := atoi[T](cc)
 	assert.Equal(t, T(0), envVar)
 	assert.NotNil(t, err)
 }
@@ -210,12 +195,12 @@ func TestAlmiAtoi_FailConvertIntSlices(t *testing.T) {
 }
 
 func TestAlmiStr_SuccessfullyConvertString(t *testing.T) {
-	if err := os.Setenv(str, strVal); err != nil {
+	if err := os.Setenv(strKey, strVal); err != nil {
 		t.Fail()
 	}
 
-	cc := almitypes.ConfigConstraint{EnvName: str}
-	envVar, err := util.AlmiStr[string](cc)
+	cc := configConstraint{EnvName: strKey}
+	envVar, err := str[string](cc)
 	if err != nil {
 		t.Fail()
 	}
@@ -224,24 +209,24 @@ func TestAlmiStr_SuccessfullyConvertString(t *testing.T) {
 }
 
 func TestAlmiStr_FailConvertString(t *testing.T) {
-	if err := os.Setenv(str, strVal); err != nil {
+	if err := os.Setenv(strKey, strVal); err != nil {
 		t.Fail()
 	}
 
-	cc := almitypes.ConfigConstraint{EnvName: str, SliceType: true, Separator: empty}
-	envVar, err := util.AlmiStr[string](cc)
+	cc := configConstraint{EnvName: strKey, SliceType: true, Separator: empty}
+	envVar, err := str[string](cc)
 	assert.Equal(t, empty, envVar)
 	assert.NotNil(t, err)
 }
 
 // No fail equivalent for this test
 func TestAlmiStr_SuccessfullyConvertStringSlice(t *testing.T) {
-	if err := os.Setenv(str, strSliceVal); err != nil {
+	if err := os.Setenv(strKey, strSliceVal); err != nil {
 		t.Fail()
 	}
 
-	cc := almitypes.ConfigConstraint{EnvName: str, SliceType: true, Separator: comma}
-	envVar, err := util.AlmiStr[string](cc)
+	cc := configConstraint{EnvName: strKey, SliceType: true, Separator: comma}
+	envVar, err := str[string](cc)
 	if err != nil {
 		t.Fail()
 	}
@@ -254,8 +239,8 @@ func TestAlmiAtob_SuccessfullyConvertBool(t *testing.T) {
 		t.Fail()
 	}
 
-	cc := almitypes.ConfigConstraint{EnvName: boolKey}
-	envVar, err := util.AlmiAtob[bool](cc)
+	cc := configConstraint{EnvName: boolKey}
+	envVar, err := atob[bool](cc)
 	if err != nil {
 		t.Fail()
 	}
@@ -268,8 +253,8 @@ func TestAlmiAtob_FailConvertBool(t *testing.T) {
 		t.Fail()
 	}
 
-	cc := almitypes.ConfigConstraint{EnvName: boolKey}
-	envVar, err := util.AlmiAtob[bool](cc)
+	cc := configConstraint{EnvName: boolKey}
+	envVar, err := atob[bool](cc)
 	assert.Equal(t, falseVal, envVar)
 	assert.NotNil(t, err)
 }
@@ -279,8 +264,8 @@ func TestAlmiAtob_SuccessfullyConvertBoolSlice(t *testing.T) {
 		t.Fail()
 	}
 
-	cc := almitypes.ConfigConstraint{EnvName: boolKey, SliceType: true, Separator: comma}
-	envVar, err := util.AlmiAtob[bool](cc)
+	cc := configConstraint{EnvName: boolKey, SliceType: true, Separator: comma}
+	envVar, err := atob[bool](cc)
 	if err != nil {
 		t.Fail()
 	}
@@ -293,8 +278,8 @@ func TestAlmiAtob_FailConvertBoolSlice(t *testing.T) {
 		t.Fail()
 	}
 
-	cc := almitypes.ConfigConstraint{EnvName: boolKey, SliceType: true, Separator: comma}
-	envVar, err := util.AlmiAtob[bool](cc)
+	cc := configConstraint{EnvName: boolKey, SliceType: true, Separator: comma}
+	envVar, err := atob[bool](cc)
 	assert.Equal(t, falseVal, envVar)
 	assert.NotNil(t, err)
 }
@@ -304,8 +289,8 @@ func TestAlmiAtoRB_SuccessfullyConvertRune(t *testing.T) {
 		t.Fail()
 	}
 
-	cc := almitypes.ConfigConstraint{EnvName: runeKey}
-	envVar, err := util.AlmiAtoRB[rune](cc)
+	cc := configConstraint{EnvName: runeKey}
+	envVar, err := atoRB[rune](cc)
 	if err != nil {
 		t.Fail()
 	}
@@ -318,8 +303,8 @@ func TestAlmiAtoRB_FailConvertRune(t *testing.T) {
 		t.Fail()
 	}
 
-	cc := almitypes.ConfigConstraint{EnvName: runeKey}
-	envVar, err := util.AlmiAtoRB[rune](cc)
+	cc := configConstraint{EnvName: runeKey}
+	envVar, err := atoRB[rune](cc)
 	assert.Equal(t, runeFail, envVar)
 	assert.NotNil(t, err)
 }
@@ -329,8 +314,8 @@ func TestAlmiAtoRB_SuccessfullyConvertRuneSlice(t *testing.T) {
 		t.Fail()
 	}
 
-	cc := almitypes.ConfigConstraint{EnvName: runeKey, SliceType: true, Separator: comma}
-	envVar, err := util.AlmiAtoRB[rune](cc)
+	cc := configConstraint{EnvName: runeKey, SliceType: true, Separator: comma}
+	envVar, err := atoRB[rune](cc)
 	if err != nil {
 		t.Fail()
 	}
@@ -343,8 +328,8 @@ func TestAlmiAtoRB_FailConvertRuneSlice(t *testing.T) {
 		t.Fail()
 	}
 
-	cc := almitypes.ConfigConstraint{EnvName: runeKey, SliceType: true, Separator: comma}
-	envVar, err := util.AlmiAtoRB[rune](cc)
+	cc := configConstraint{EnvName: runeKey, SliceType: true, Separator: comma}
+	envVar, err := atoRB[rune](cc)
 	assert.Equal(t, runeFail, envVar)
 	assert.NotNil(t, err)
 }

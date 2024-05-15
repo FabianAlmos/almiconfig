@@ -1,7 +1,6 @@
-package almi_test
+package almi
 
 import (
-	"almi"
 	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
@@ -60,7 +59,7 @@ func TestValidateConfig_Successful(t *testing.T) {
 		t.Fail()
 	}
 
-	cfg, err := almi.ValidateConfig(testConfig{})
+	cfg, err := ValidateConfig(testConfig{})
 	if err != nil {
 		t.Fail()
 	}
@@ -83,7 +82,7 @@ func TestValidateConfig_Fail_NoEnvConstraint(t *testing.T) {
 		t.Fail()
 	}
 
-	cfg, err := almi.ValidateConfig(testConfigNoEnvForAccessSecret{})
+	cfg, err := ValidateConfig(testConfigNoEnvForAccessSecret{})
 	assert.Nil(t, cfg)
 	assert.NotNil(t, err)
 }
@@ -99,7 +98,7 @@ func TestValidateConfig_Fail_RequiredAndNotSet(t *testing.T) {
 		t.Fail()
 	}
 
-	cfg, err := almi.ValidateConfig(testConfig{})
+	cfg, err := ValidateConfig(testConfig{})
 	assert.Nil(t, cfg)
 	assert.NotNil(t, err)
 }
@@ -111,7 +110,7 @@ func TestValidateConfig_CheckTypeConstraint(t *testing.T) {
 		t.Fail()
 	}
 
-	cfg, err := almi.ValidateConfig(testConfigTypeConstraint{})
+	cfg, err := ValidateConfig(testConfigTypeConstraint{})
 	if err != nil {
 		t.Fail()
 	}
@@ -126,7 +125,7 @@ func TestValidateConfig_Fail_InvalidStructTag(t *testing.T) {
 		t.Fail()
 	}
 
-	cfg, err := almi.ValidateConfig(testConfigInvalidConstraint{})
+	cfg, err := ValidateConfig(testConfigInvalidConstraint{})
 	assert.Nil(t, cfg)
 	assert.NotNil(t, err)
 }
@@ -138,7 +137,7 @@ func TestValidateConfig_Fail_BadTypeConversion(t *testing.T) {
 		t.Fail()
 	}
 
-	cfg, err := almi.ValidateConfig(testConfigBadTypeConversion{})
+	cfg, err := ValidateConfig(testConfigBadTypeConversion{})
 	assert.Nil(t, cfg)
 	assert.NotNil(t, err)
 }
@@ -150,7 +149,7 @@ func TestValidateConfig_Fail_TypeMismatch(t *testing.T) {
 		t.Fail()
 	}
 
-	cfg, err := almi.ValidateConfig(testConfigTypeMismatch{})
+	cfg, err := ValidateConfig(testConfigTypeMismatch{})
 	assert.Nil(t, cfg)
 	assert.NotNil(t, err)
 }

@@ -1,24 +1,23 @@
-package util
+package almi
 
 import (
 	"almi/consts"
 	almierrors "almi/errors"
-	almitypes "almi/types"
 	"golang.org/x/exp/constraints"
 	"os"
 	"strconv"
 	"strings"
 )
 
-type IntConstraint interface {
+type intConstraint interface {
 	constraints.Signed | constraints.Unsigned
 }
 
-type Number interface {
-	IntConstraint | constraints.Float
+type number interface {
+	intConstraint | constraints.Float
 }
 
-func AlmiAtoi[T Number](cc almitypes.ConfigConstraint) (any, error) {
+func atoi[T number](cc configConstraint) (any, error) {
 	envVal := os.Getenv(cc.EnvName)
 	if !cc.Required && envVal == consts.EMPTY {
 		return T(0), nil
@@ -50,7 +49,7 @@ func AlmiAtoi[T Number](cc almitypes.ConfigConstraint) (any, error) {
 }
 
 // Generic for readability and proper zero value return
-func AlmiStr[T ~string](cc almitypes.ConfigConstraint) (val any, err error) {
+func str[T ~string](cc configConstraint) (val any, err error) {
 	envVal := os.Getenv(cc.EnvName)
 	if !cc.Required && envVal == consts.EMPTY {
 		return T(consts.EMPTY), nil
@@ -72,7 +71,7 @@ func AlmiStr[T ~string](cc almitypes.ConfigConstraint) (val any, err error) {
 }
 
 // Generic for readability and proper zero value return
-func AlmiAtob[T ~bool](cc almitypes.ConfigConstraint) (val any, err error) {
+func atob[T ~bool](cc configConstraint) (val any, err error) {
 	envVal := os.Getenv(cc.EnvName)
 	if !cc.Required && envVal == consts.EMPTY {
 		return T(false), nil
@@ -103,7 +102,7 @@ func AlmiAtob[T ~bool](cc almitypes.ConfigConstraint) (val any, err error) {
 	return T(b), nil
 }
 
-func AlmiAtoRB[T ~rune | ~byte](cc almitypes.ConfigConstraint) (val any, err error) {
+func atoRB[T ~rune | ~byte](cc configConstraint) (val any, err error) {
 	envVal := os.Getenv(cc.EnvName)
 	if !cc.Required && envVal == consts.EMPTY {
 		return T(0), nil
