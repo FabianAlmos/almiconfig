@@ -76,6 +76,8 @@ func (cc *configConstraint) findType() (any, error) {
 		envVar, err = atoi[int32](*cc)
 	case _int64:
 		envVar, err = atoi[int64](*cc)
+	case _uint:
+		envVar, err = atoi[uint](*cc)
 	case _uint8:
 		envVar, err = atoi[uint8](*cc)
 	case _uint16:

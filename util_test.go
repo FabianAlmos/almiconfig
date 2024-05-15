@@ -18,6 +18,7 @@ const (
 	sevenStr = "7"
 	eightStr = "8"
 	nineStr  = "9"
+	tenStr   = "10"
 
 	zero  = uintptr(0)
 	one   = int(1)
@@ -25,10 +26,11 @@ const (
 	three = int16(3)
 	four  = int32(4)
 	five  = int64(5)
-	six   = uint8(6)
-	seven = uint16(7)
-	eight = uint32(8)
-	nine  = uint64(9)
+	six   = uint(6)
+	seven = uint8(7)
+	eight = uint16(8)
+	nine  = uint32(9)
+	ten   = uint64(10)
 
 	comma         = ","
 	badStrSlice   = "0,x"
@@ -42,6 +44,7 @@ const (
 	sevenStrSlice = "7,7"
 	eightStrSlice = "8,8"
 	nineStrSlice  = "9,9"
+	tenStrSlice   = "10,10"
 
 	empty       = ""
 	strKey      = "str"
@@ -72,10 +75,11 @@ var (
 	threeSlice = []int16{three, three}
 	fourSlice  = []int32{four, four}
 	fiveSlice  = []int64{five, five}
-	sixSlice   = []uint8{six, six}
-	sevenSlice = []uint16{seven, seven}
-	eightSlice = []uint32{eight, eight}
-	nineSlice  = []uint64{nine, nine}
+	sixSlice   = []uint{six, six}
+	sevenSlice = []uint8{seven, seven}
+	eightSlice = []uint16{eight, eight}
+	nineSlice  = []uint32{nine, nine}
+	tenSlice   = []uint64{ten, ten}
 
 	strSlice = []string{strVal, strVal}
 
@@ -83,11 +87,11 @@ var (
 
 	runeSlice = []rune{65, 65}
 
-	intTypes     = []string{_uintptr, _int, _int8, _int16, _int32, _int64, _uint8, _uint16, _uint32, _uint64}
-	strVals      = []string{zeroStr, oneStr, twoStr, threeStr, fourStr, fiveStr, sixStr, sevenStr, eightStr, nineStr}
-	badStrVals   = []string{badVal, badVal, badVal, badVal, badVal, badVal, badVal, badVal, badVal, badVal}
-	sliceVals    = []string{zeroStrSlice, oneStrSlice, twoStrSlice, threeStrSlice, fourStrSlice, fiveStrSlice, sixStrSlice, sevenStrSlice, eightStrSlice, nineStrSlice}
-	badSliceVals = []string{badStrSlice, badStrSlice, badStrSlice, badStrSlice, badStrSlice, badStrSlice, badStrSlice, badStrSlice, badStrSlice, badStrSlice}
+	intTypes     = []string{_uintptr, _int, _int8, _int16, _int32, _int64, _uint, _uint8, _uint16, _uint32, _uint64}
+	strVals      = []string{zeroStr, oneStr, twoStr, threeStr, fourStr, fiveStr, sixStr, sevenStr, eightStr, nineStr, tenStr}
+	badStrVals   = []string{badVal, badVal, badVal, badVal, badVal, badVal, badVal, badVal, badVal, badVal, badVal}
+	sliceVals    = []string{zeroStrSlice, oneStrSlice, twoStrSlice, threeStrSlice, fourStrSlice, fiveStrSlice, sixStrSlice, sevenStrSlice, eightStrSlice, nineStrSlice, tenStrSlice}
+	badSliceVals = []string{badStrSlice, badStrSlice, badStrSlice, badStrSlice, badStrSlice, badStrSlice, badStrSlice, badStrSlice, badStrSlice, badStrSlice, badStrSlice}
 )
 
 func testSetEnv(t *testing.T, key, val string) {
@@ -143,10 +147,11 @@ func TestAlmiAtoi_SuccessfullyConvertInts(t *testing.T) {
 	testAlmiAtoi[int16](t, _int16, three)
 	testAlmiAtoi[int32](t, _int32, four)
 	testAlmiAtoi[int64](t, _int64, five)
-	testAlmiAtoi[uint8](t, _uint8, six)
-	testAlmiAtoi[uint16](t, _uint16, seven)
-	testAlmiAtoi[uint32](t, _uint32, eight)
-	testAlmiAtoi[uint64](t, _uint64, nine)
+	testAlmiAtoi[uint](t, _uint, six)
+	testAlmiAtoi[uint8](t, _uint8, seven)
+	testAlmiAtoi[uint16](t, _uint16, eight)
+	testAlmiAtoi[uint32](t, _uint32, nine)
+	testAlmiAtoi[uint64](t, _uint64, ten)
 }
 
 func TestAlmiAtoi_FailConvertInts(t *testing.T) {
@@ -158,6 +163,7 @@ func TestAlmiAtoi_FailConvertInts(t *testing.T) {
 	testAlmiAtoiFail[int16](t, _int16)
 	testAlmiAtoiFail[int32](t, _int32)
 	testAlmiAtoiFail[int64](t, _int64)
+	testAlmiAtoiFail[uint](t, _uint)
 	testAlmiAtoiFail[uint8](t, _uint8)
 	testAlmiAtoiFail[uint16](t, _uint16)
 	testAlmiAtoiFail[uint32](t, _uint32)
@@ -173,10 +179,11 @@ func TestAlmiAtoi_SuccessfullyConvertIntSlices(t *testing.T) {
 	testAlmiAtoiSlice[int16](t, _int16, threeSlice)
 	testAlmiAtoiSlice[int32](t, _int32, fourSlice)
 	testAlmiAtoiSlice[int64](t, _int64, fiveSlice)
-	testAlmiAtoiSlice[uint8](t, _uint8, sixSlice)
-	testAlmiAtoiSlice[uint16](t, _uint16, sevenSlice)
-	testAlmiAtoiSlice[uint32](t, _uint32, eightSlice)
-	testAlmiAtoiSlice[uint64](t, _uint64, nineSlice)
+	testAlmiAtoiSlice[uint](t, _uint, sixSlice)
+	testAlmiAtoiSlice[uint8](t, _uint8, sevenSlice)
+	testAlmiAtoiSlice[uint16](t, _uint16, eightSlice)
+	testAlmiAtoiSlice[uint32](t, _uint32, nineSlice)
+	testAlmiAtoiSlice[uint64](t, _uint64, tenSlice)
 }
 
 func TestAlmiAtoi_FailConvertIntSlices(t *testing.T) {
@@ -188,6 +195,7 @@ func TestAlmiAtoi_FailConvertIntSlices(t *testing.T) {
 	testAlmiAtoiSliceFail[int16](t, _int16)
 	testAlmiAtoiSliceFail[int32](t, _int32)
 	testAlmiAtoiSliceFail[int64](t, _int64)
+	testAlmiAtoiSliceFail[uint](t, _uint)
 	testAlmiAtoiSliceFail[uint8](t, _uint8)
 	testAlmiAtoiSliceFail[uint16](t, _uint16)
 	testAlmiAtoiSliceFail[uint32](t, _uint32)

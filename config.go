@@ -26,6 +26,7 @@ const (
 	_int16   = "int16"
 	_int32   = "int32"
 	_int64   = "int64"
+	_uint    = "uint"
 	_uint8   = "uint8"
 	_uint16  = "uint16"
 	_uint32  = "uint32"
