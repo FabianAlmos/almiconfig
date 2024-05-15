@@ -1,4 +1,4 @@
-module almiconfig
+module github.com/FabianAlmos/almiconfig
 
 go 1.22.1
 
