@@ -7,6 +7,7 @@ Almi config is a lightweight configuration loader module for Go based on struct 
 - **int16**
 - **int32**
 - **int64**
+- **uint**
 - **uint8**
 - **uint16**
 - **uint32**
