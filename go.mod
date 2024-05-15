@@ -1,4 +1,4 @@
-module almi
+module almiconfig
 
 go 1.22.1
 
