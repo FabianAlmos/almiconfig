@@ -1,9 +1,10 @@
 package almiconfig
 
 import (
+	"regexp"
+
 	"github.com/FabianAlmos/almiconfig/consts"
 	almierrors "github.com/FabianAlmos/almiconfig/errors"
-	"regexp"
 )
 
 type configConstraint struct {
@@ -67,31 +68,31 @@ func (cc *configConstraint) findType() (any, error) {
 	case _bool:
 		envVar, err = atob[bool](*cc)
 	case _int:
-		envVar, err = atoi[int](*cc)
+		envVar, err = aton[int](*cc)
 	case _int8:
-		envVar, err = atoi[int8](*cc)
+		envVar, err = aton[int8](*cc)
 	case _int16:
-		envVar, err = atoi[int16](*cc)
+		envVar, err = aton[int16](*cc)
 	case _int32:
-		envVar, err = atoi[int32](*cc)
+		envVar, err = aton[int32](*cc)
 	case _int64:
-		envVar, err = atoi[int64](*cc)
+		envVar, err = aton[int64](*cc)
 	case _uint:
-		envVar, err = atoi[uint](*cc)
+		envVar, err = aton[uint](*cc)
 	case _uint8:
-		envVar, err = atoi[uint8](*cc)
+		envVar, err = aton[uint8](*cc)
 	case _uint16:
-		envVar, err = atoi[uint16](*cc)
+		envVar, err = aton[uint16](*cc)
 	case _uint32:
-		envVar, err = atoi[uint32](*cc)
+		envVar, err = aton[uint32](*cc)
 	case _uint64:
-		envVar, err = atoi[uint64](*cc)
+		envVar, err = aton[uint64](*cc)
 	case _uintptr:
-		envVar, err = atoi[uintptr](*cc)
+		envVar, err = aton[uintptr](*cc)
 	case _float32:
-		envVar, err = atoi[float32](*cc)
+		envVar, err = aton[float32](*cc)
 	case _float64:
-		envVar, err = atoi[float64](*cc)
+		envVar, err = aton[float64](*cc)
 	case _byte:
 		envVar, err = atoRB[byte](*cc)
 	case _rune:

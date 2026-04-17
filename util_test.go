@@ -1,9 +1,10 @@
 package almiconfig
 
 import (
-	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 const (
@@ -106,34 +107,34 @@ func initIntEnv(t *testing.T, vals []string) {
 	}
 }
 
-func testAlmiAtoi[T number](t *testing.T, key string, expect any) {
+func testAlmiAton[T number](t *testing.T, key string, expect any) {
 	cc := configConstraint{EnvName: key}
-	envVar, err := atoi[T](cc)
+	envVar, err := aton[T](cc)
 	if err != nil {
 		t.Fail()
 	}
 	assert.Equal(t, expect, envVar)
 }
 
-func testAlmiAtoiSlice[T number](t *testing.T, key string, expect any) {
+func testAlmiAtonSlice[T number](t *testing.T, key string, expect any) {
 	cc := configConstraint{EnvName: key, SliceType: true, Separator: comma}
-	envVar, err := atoi[T](cc)
+	envVar, err := aton[T](cc)
 	if err != nil {
 		t.Fail()
 	}
 	assert.Equal(t, expect, envVar)
 }
 
-func testAlmiAtoiFail[T number](t *testing.T, key string) {
+func testAlmiAtonFail[T number](t *testing.T, key string) {
 	cc := configConstraint{EnvName: key}
-	envVar, err := atoi[T](cc)
+	envVar, err := aton[T](cc)
 	assert.Equal(t, T(0), envVar)
 	assert.NotNil(t, err)
 }
 
-func testAlmiAtoiSliceFail[T number](t *testing.T, key string) {
+func testAlmiAtonSliceFail[T number](t *testing.T, key string) {
 	cc := configConstraint{EnvName: key, SliceType: true, Separator: comma}
-	envVar, err := atoi[T](cc)
+	envVar, err := aton[T](cc)
 	assert.Equal(t, T(0), envVar)
 	assert.NotNil(t, err)
 }
@@ -141,65 +142,65 @@ func testAlmiAtoiSliceFail[T number](t *testing.T, key string) {
 func TestAlmiAtoi_SuccessfullyConvertInts(t *testing.T) {
 	initIntEnv(t, strVals)
 
-	testAlmiAtoi[uintptr](t, _uintptr, zero)
-	testAlmiAtoi[int](t, _int, one)
-	testAlmiAtoi[int8](t, _int8, two)
-	testAlmiAtoi[int16](t, _int16, three)
-	testAlmiAtoi[int32](t, _int32, four)
-	testAlmiAtoi[int64](t, _int64, five)
-	testAlmiAtoi[uint](t, _uint, six)
-	testAlmiAtoi[uint8](t, _uint8, seven)
-	testAlmiAtoi[uint16](t, _uint16, eight)
-	testAlmiAtoi[uint32](t, _uint32, nine)
-	testAlmiAtoi[uint64](t, _uint64, ten)
+	testAlmiAton[uintptr](t, _uintptr, zero)
+	testAlmiAton[int](t, _int, one)
+	testAlmiAton[int8](t, _int8, two)
+	testAlmiAton[int16](t, _int16, three)
+	testAlmiAton[int32](t, _int32, four)
+	testAlmiAton[int64](t, _int64, five)
+	testAlmiAton[uint](t, _uint, six)
+	testAlmiAton[uint8](t, _uint8, seven)
+	testAlmiAton[uint16](t, _uint16, eight)
+	testAlmiAton[uint32](t, _uint32, nine)
+	testAlmiAton[uint64](t, _uint64, ten)
 }
 
 func TestAlmiAtoi_FailConvertInts(t *testing.T) {
 	initIntEnv(t, badStrVals)
 
-	testAlmiAtoiFail[uintptr](t, _uintptr)
-	testAlmiAtoiFail[int](t, _int)
-	testAlmiAtoiFail[int8](t, _int8)
-	testAlmiAtoiFail[int16](t, _int16)
-	testAlmiAtoiFail[int32](t, _int32)
-	testAlmiAtoiFail[int64](t, _int64)
-	testAlmiAtoiFail[uint](t, _uint)
-	testAlmiAtoiFail[uint8](t, _uint8)
-	testAlmiAtoiFail[uint16](t, _uint16)
-	testAlmiAtoiFail[uint32](t, _uint32)
-	testAlmiAtoiFail[uint64](t, _uint64)
+	testAlmiAtonFail[uintptr](t, _uintptr)
+	testAlmiAtonFail[int](t, _int)
+	testAlmiAtonFail[int8](t, _int8)
+	testAlmiAtonFail[int16](t, _int16)
+	testAlmiAtonFail[int32](t, _int32)
+	testAlmiAtonFail[int64](t, _int64)
+	testAlmiAtonFail[uint](t, _uint)
+	testAlmiAtonFail[uint8](t, _uint8)
+	testAlmiAtonFail[uint16](t, _uint16)
+	testAlmiAtonFail[uint32](t, _uint32)
+	testAlmiAtonFail[uint64](t, _uint64)
 }
 
 func TestAlmiAtoi_SuccessfullyConvertIntSlices(t *testing.T) {
 	initIntEnv(t, sliceVals)
 
-	testAlmiAtoiSlice[uintptr](t, _uintptr, zeroSlice)
-	testAlmiAtoiSlice[int](t, _int, oneSlice)
-	testAlmiAtoiSlice[int8](t, _int8, twoSlice)
-	testAlmiAtoiSlice[int16](t, _int16, threeSlice)
-	testAlmiAtoiSlice[int32](t, _int32, fourSlice)
-	testAlmiAtoiSlice[int64](t, _int64, fiveSlice)
-	testAlmiAtoiSlice[uint](t, _uint, sixSlice)
-	testAlmiAtoiSlice[uint8](t, _uint8, sevenSlice)
-	testAlmiAtoiSlice[uint16](t, _uint16, eightSlice)
-	testAlmiAtoiSlice[uint32](t, _uint32, nineSlice)
-	testAlmiAtoiSlice[uint64](t, _uint64, tenSlice)
+	testAlmiAtonSlice[uintptr](t, _uintptr, zeroSlice)
+	testAlmiAtonSlice[int](t, _int, oneSlice)
+	testAlmiAtonSlice[int8](t, _int8, twoSlice)
+	testAlmiAtonSlice[int16](t, _int16, threeSlice)
+	testAlmiAtonSlice[int32](t, _int32, fourSlice)
+	testAlmiAtonSlice[int64](t, _int64, fiveSlice)
+	testAlmiAtonSlice[uint](t, _uint, sixSlice)
+	testAlmiAtonSlice[uint8](t, _uint8, sevenSlice)
+	testAlmiAtonSlice[uint16](t, _uint16, eightSlice)
+	testAlmiAtonSlice[uint32](t, _uint32, nineSlice)
+	testAlmiAtonSlice[uint64](t, _uint64, tenSlice)
 }
 
 func TestAlmiAtoi_FailConvertIntSlices(t *testing.T) {
 	initIntEnv(t, badSliceVals)
 
-	testAlmiAtoiSliceFail[uintptr](t, _uintptr)
-	testAlmiAtoiSliceFail[int](t, _int)
-	testAlmiAtoiSliceFail[int8](t, _int8)
-	testAlmiAtoiSliceFail[int16](t, _int16)
-	testAlmiAtoiSliceFail[int32](t, _int32)
-	testAlmiAtoiSliceFail[int64](t, _int64)
-	testAlmiAtoiSliceFail[uint](t, _uint)
-	testAlmiAtoiSliceFail[uint8](t, _uint8)
-	testAlmiAtoiSliceFail[uint16](t, _uint16)
-	testAlmiAtoiSliceFail[uint32](t, _uint32)
-	testAlmiAtoiSliceFail[uint64](t, _uint64)
+	testAlmiAtonSliceFail[uintptr](t, _uintptr)
+	testAlmiAtonSliceFail[int](t, _int)
+	testAlmiAtonSliceFail[int8](t, _int8)
+	testAlmiAtonSliceFail[int16](t, _int16)
+	testAlmiAtonSliceFail[int32](t, _int32)
+	testAlmiAtonSliceFail[int64](t, _int64)
+	testAlmiAtonSliceFail[uint](t, _uint)
+	testAlmiAtonSliceFail[uint8](t, _uint8)
+	testAlmiAtonSliceFail[uint16](t, _uint16)
+	testAlmiAtonSliceFail[uint32](t, _uint32)
+	testAlmiAtonSliceFail[uint64](t, _uint64)
 }
 
 func TestAlmiStr_SuccessfullyConvertString(t *testing.T) {

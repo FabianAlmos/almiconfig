@@ -1,12 +1,13 @@
 package almiconfig
 
 import (
-	"github.com/FabianAlmos/almiconfig/consts"
-	almierrors "github.com/FabianAlmos/almiconfig/errors"
-	"golang.org/x/exp/constraints"
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/FabianAlmos/almiconfig/consts"
+	almierrors "github.com/FabianAlmos/almiconfig/errors"
+	"golang.org/x/exp/constraints"
 )
 
 type intConstraint interface {
@@ -17,7 +18,7 @@ type number interface {
 	intConstraint | constraints.Float
 }
 
-func atoi[T number](cc configConstraint) (any, error) {
+func aton[T number](cc configConstraint) (any, error) {
 	envVal := os.Getenv(cc.EnvName)
 	if !cc.Required && envVal == consts.EMPTY {
 		return T(0), nil
