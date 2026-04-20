@@ -70,7 +70,34 @@ the **almi** struct tag.
         Brokers []string `almi:"env=BROKERS,type=[,]string"`
     }
     ```
+- **default**:
+  - The **default** constraint can be used to set a default value for environment variables in-case they are not set in the environment.
+  - If the **required** constraint is set on a config field and the **default** constraint is also set,
+    the **required** constraint won't raise an error during the validation of the config.
+  - If the field is a slice type set by the **type** constraint,
+    the **default** constraint's value must be set with square brackets around the default value.
+    Like in the second example shown below, also make sure that the separator character matches the separator set in the **type** constraint.
+  - usage:
+    ```go
+    package main
     
+    // regular field example
+    // env: empty
+    
+    type Config struct {
+        SecretLifetime int `almi:"required,env=SECRET_LIFETIME,type=int,default=1440"`
+    }
+    ```
+    ```go
+    package main
+    
+    // slice type field example
+    // env: empty
+    
+    type Config struct {
+        Brokers []string `almi:"required,env=BROKERS,type=[,]string,default=[broker1,broker2,broker3]"`
+    }
+    ```
 ## Usage example:
 **.env**:
 ```

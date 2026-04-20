@@ -34,6 +34,7 @@ const (
 	ten   = uint64(10)
 
 	comma         = ","
+	dot           = "."
 	badStrSlice   = "0,x"
 	zeroStrSlice  = "0,0"
 	oneStrSlice   = "1,1"
@@ -47,10 +48,12 @@ const (
 	nineStrSlice  = "9,9"
 	tenStrSlice   = "10,10"
 
-	empty       = ""
-	strKey      = "str"
-	strVal      = "strVal"
-	strSliceVal = "strVal,strVal"
+	empty                       = ""
+	strKey                      = "str"
+	strVal                      = "strVal"
+	strSliceVal                 = "strVal,strVal"
+	strSliceDefaultVal          = "[strVal,strVal]"
+	strSliceDefaultBadFormatVal = "[strVal,strVal"
 
 	boolKey         = "bool"
 	boolVal         = "true"
@@ -341,4 +344,25 @@ func TestAlmiAtoRB_FailConvertRuneSlice(t *testing.T) {
 	envVar, err := atoRB[rune](cc)
 	assert.Equal(t, runeFail, envVar)
 	assert.NotNil(t, err)
+}
+
+func TestAlmiStr_SuccessfullyGetSliceDefaultValue(t *testing.T) {
+	cc := configConstraint{EnvName: strKey, SliceType: true, Separator: comma, HasDefault: true, Default: strSliceDefaultVal}
+	envVar, err := str[string](cc)
+	assert.Nil(t, err)
+	assert.Equal(t, strSlice, envVar)
+}
+
+func TestAlmiStr_FailGetSliceDefaultValue(t *testing.T) {
+	cc := configConstraint{EnvName: strKey, SliceType: true, Separator: comma, HasDefault: true, Default: strSliceDefaultBadFormatVal}
+	envVar, err := str[string](cc)
+	assert.Nil(t, envVar)
+	assert.NotNil(t, err)
+}
+
+func TestAlmiStr_FailGetSliceDefaultValue_SeparatorMismatch(t *testing.T) {
+	cc := configConstraint{EnvName: strKey, SliceType: true, Separator: dot, HasDefault: true, Default: strSliceDefaultVal}
+	envVar, err := str[string](cc)
+	assert.Nil(t, err)
+	assert.NotEqual(t, strSlice, envVar)
 }

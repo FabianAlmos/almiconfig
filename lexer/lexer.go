@@ -3,8 +3,12 @@ package lexer
 import "github.com/FabianAlmos/almiconfig/consts"
 
 const (
-	COMMA      = 44
-	LSQBRACKET = 91
+	_COMMA      = 44
+	_EQUALS     = 61
+	_LSQBRACKET = 91
+	_RSQBRACKET = 93
+
+	_DEFAULT_TOKEN = "default"
 )
 
 type Lexer struct {
@@ -45,7 +49,17 @@ func (l *Lexer) Next() rune {
 func (l *Lexer) Tokenize() []string {
 	for l.HasNext() {
 		l.Next()
-		if l.Char == COMMA && l.Token[len(l.Token)-1] != LSQBRACKET {
+		if l.Char == _EQUALS && l.Token == _DEFAULT_TOKEN {
+			l.Token += string(l.Char)
+			l.Next()
+			if l.Char == _LSQBRACKET {
+				for l.HasNext() && l.Char != _RSQBRACKET {
+					l.Token += string(l.Char)
+					l.Next()
+				}
+			}
+		}
+		if l.Char == _COMMA && l.Token[len(l.Token)-1] != _LSQBRACKET {
 			l.Next()
 			l.Tokens = append(l.Tokens, l.Token)
 			l.Token = consts.EMPTY

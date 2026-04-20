@@ -32,6 +32,8 @@ const (
 	EnvConstraintUndefErr         AlmiErrorMsg = "'env=' constraint must be defined for all fields of the config, constraint not found for field: '%s'"
 	FieldRequiredErr              AlmiErrorMsg = "Field: '%s', is required"
 	FailedToConvertTypeErr        AlmiErrorMsg = "failed to convert type of '%s' to %s from string"
+	FailedToConvertDefaultTypeErr AlmiErrorMsg = "failed to convert default value '%s' for config field '%s', expected %s type default value"
+	SliceDefaultValueFormatErr    AlmiErrorMsg = "slice default value: %s must have opening and closing brackets, like: [...]"
 )
 
 func (aem AlmiErrorMsg) Build(args ...any) *almiError {

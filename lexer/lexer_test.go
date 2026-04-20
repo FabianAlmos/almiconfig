@@ -1,9 +1,10 @@
 package lexer_test
 
 import (
+	"testing"
+
 	"github.com/FabianAlmos/almiconfig/lexer"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 const (
@@ -11,15 +12,17 @@ const (
 	testLine = "test"
 	zeroRune = rune(0)
 
-	requiredLine           = "required"
-	reqEnvAccLine          = "required,env=ACCESS_SECRET"
-	reqEnvAccSliceTypeLine = "required,env=ACCESS_SECRET,type=[,]string"
+	requiredLine                               = "required"
+	reqEnvAccLine                              = "required,env=ACCESS_SECRET"
+	reqEnvAccSliceTypeLine                     = "required,env=ACCESS_SECRET,type=[,]string"
+	reqEnvBrokersSliceTypeWithDefaultValueLine = "required,env=BROKERS,type=[,]string,default=[broker1,broker2,broker3]"
 )
 
 var (
-	required           = []string{"required"}
-	reqEnvAcc          = []string{"required", "env=ACCESS_SECRET"}
-	reqEnvAccSliceType = []string{"required", "env=ACCESS_SECRET", "type=[,]string"}
+	required                               = []string{"required"}
+	reqEnvAcc                              = []string{"required", "env=ACCESS_SECRET"}
+	reqEnvAccSliceType                     = []string{"required", "env=ACCESS_SECRET", "type=[,]string"}
+	reqEnvBrokersSliceTypeWithDefaultValue = []string{"required", "env=BROKERS", "type=[,]string", "default=[broker1,broker2,broker3]"}
 )
 
 func TestNewLexer(t *testing.T) {
@@ -55,4 +58,9 @@ func TestLexer_Tokenize_SuccessfulLexMultipleConstraints(t *testing.T) {
 func TestLexer_Tokenize_SuccessfulLexMultipleConstraints_NoSplitOnBracketComma(t *testing.T) {
 	l := lexer.NewLexer(reqEnvAccSliceTypeLine)
 	assert.Equal(t, reqEnvAccSliceType, l.Tokenize())
+}
+
+func TestLexer_Tokenize_SuccessfulLexDefaultWithSliceType(t *testing.T) {
+	l := lexer.NewLexer(reqEnvBrokersSliceTypeWithDefaultValueLine)
+	assert.Equal(t, reqEnvBrokersSliceTypeWithDefaultValue, l.Tokenize())
 }

@@ -2,6 +2,7 @@ package almiconfig
 
 import (
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -9,6 +10,10 @@ import (
 	almierrors "github.com/FabianAlmos/almiconfig/errors"
 	"golang.org/x/exp/constraints"
 )
+
+const sliceBracketsPattern = `\[.*\]`
+
+var sliceBracketsRegexp = regexp.MustCompile(sliceBracketsPattern)
 
 type intConstraint interface {
 	constraints.Signed | constraints.Unsigned
@@ -18,8 +23,28 @@ type number interface {
 	intConstraint | constraints.Float
 }
 
-func aton[T number](cc configConstraint) (any, error) {
+func getEnvVal(cc configConstraint) (string, error) {
 	envVal := os.Getenv(cc.EnvName)
+	if cc.HasDefault && cc.Default != consts.EMPTY {
+		if cc.SliceType && !sliceBracketsRegexp.MatchString(cc.Default) {
+			return "", almierrors.SliceDefaultValueFormatErr.Build(cc.Default)
+		}
+
+		if cc.SliceType && sliceBracketsRegexp.MatchString(cc.Default) {
+			envVal = cc.Default[1 : len(cc.Default)-1]
+		} else {
+			envVal = cc.Default
+		}
+	}
+	return envVal, nil
+}
+
+func aton[T number](cc configConstraint) (any, error) {
+	envVal, err := getEnvVal(cc)
+	if err != nil {
+		return nil, err
+	}
+
 	if !cc.Required && envVal == consts.EMPTY {
 		return T(0), nil
 	}
@@ -51,7 +76,11 @@ func aton[T number](cc configConstraint) (any, error) {
 
 // Generic for readability and proper zero value return
 func str[T ~string](cc configConstraint) (val any, err error) {
-	envVal := os.Getenv(cc.EnvName)
+	envVal, err := getEnvVal(cc)
+	if err != nil {
+		return nil, err
+	}
+
 	if !cc.Required && envVal == consts.EMPTY {
 		return T(consts.EMPTY), nil
 	}
@@ -73,7 +102,11 @@ func str[T ~string](cc configConstraint) (val any, err error) {
 
 // Generic for readability and proper zero value return
 func atob[T ~bool](cc configConstraint) (val any, err error) {
-	envVal := os.Getenv(cc.EnvName)
+	envVal, err := getEnvVal(cc)
+	if err != nil {
+		return nil, err
+	}
+
 	if !cc.Required && envVal == consts.EMPTY {
 		return T(false), nil
 	}
@@ -104,7 +137,11 @@ func atob[T ~bool](cc configConstraint) (val any, err error) {
 }
 
 func atoRB[T ~rune | ~byte](cc configConstraint) (val any, err error) {
-	envVal := os.Getenv(cc.EnvName)
+	envVal, err := getEnvVal(cc)
+	if err != nil {
+		return nil, err
+	}
+
 	if !cc.Required && envVal == consts.EMPTY {
 		return T(0), nil
 	}

@@ -16,6 +16,9 @@ type configConstraint struct {
 
 	SliceType bool
 	Separator string
+
+	HasDefault bool
+	Default    string
 }
 
 func newConfigConstraint(val *configValue) *configConstraint {
@@ -31,7 +34,7 @@ func (cc *configConstraint) parseConstraints(constraints []string) error {
 			cc.Required = true
 			continue
 		case regexp.MustCompile(env).MatchString(c):
-			cc.EnvName = string(regexp.MustCompile(envEq).ReplaceAll([]byte(c), []byte("")))
+			cc.EnvName = string(regexp.MustCompile(envEq).ReplaceAll([]byte(c), []byte(consts.EMPTY)))
 			continue
 		case regexp.MustCompile(_type).MatchString(c):
 			if regexp.MustCompile(typeSlice).MatchString(c) {
@@ -47,6 +50,10 @@ func (cc *configConstraint) parseConstraints(constraints []string) error {
 			}
 
 			cc.Type = string(regexp.MustCompile(typeEq).ReplaceAll([]byte(c), []byte(consts.EMPTY)))
+			continue
+		case regexp.MustCompile(_default).MatchString(c):
+			cc.HasDefault = true
+			cc.Default = string(regexp.MustCompile(defaultEq).ReplaceAll([]byte(c), []byte(consts.EMPTY)))
 			continue
 		default:
 			return almierrors.ConstraintUnknownErr.Build(c, cc.FieldName)

@@ -1,10 +1,11 @@
 package almiconfig
 
 import (
-	"github.com/FabianAlmos/almiconfig/consts"
-	almierrors "github.com/FabianAlmos/almiconfig/errors"
 	"reflect"
 	"regexp"
+
+	"github.com/FabianAlmos/almiconfig/consts"
+	almierrors "github.com/FabianAlmos/almiconfig/errors"
 )
 
 const (
@@ -18,6 +19,8 @@ const (
 	sliceSep  = "\\[.{1}\\]"
 	slice     = "\\[\\]"
 	typeSlice = "^(type=\\[.{1}\\].+)$"
+	defaultEq = "(default=)"
+	_default  = "^(default=.+)$"
 
 	_bool    = "bool"
 	_string  = "string"
@@ -72,6 +75,9 @@ func ValidateConfig[T any](config T) (*T, error) {
 
 		envVar, err := cfgConstraint.findType()
 		if err != nil {
+			if cfgConstraint.HasDefault {
+				return nil, almierrors.FailedToConvertDefaultTypeErr.Build(cfgConstraint.Default, cfgConstraint.EnvName, cfgConstraint.Type)
+			}
 			return nil, almierrors.FailedToConvertTypeErr.Build(cfgConstraint.EnvName, cfgConstraint.Type)
 		}
 
